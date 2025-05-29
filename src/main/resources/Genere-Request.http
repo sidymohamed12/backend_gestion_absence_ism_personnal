@@ -1,4 +1,4 @@
 ################################################
-GET http://localhost:8080/api/mobile/etudiant/6/absences
+GET http://localhost:8080/api/mobile/etudiant/10/absences
 
 #######################################
