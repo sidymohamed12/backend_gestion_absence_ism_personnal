@@ -1,5 +1,9 @@
 package smrs.backend_gestion_absence_ism.mobile.dto.request;
 
+import org.springframework.web.multipart.MultipartFile;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,6 +23,7 @@ public class JustificationRequestDto {
     @Schema(description = "Description de la justification", example = "Maladie avec certificat médical")
     private String description;
 
-    @Schema(description = "Chemin vers le fichier justificatif", example = "/files/justifications/medecin.pdf")
-    private String documentPath;
+    @JsonIgnore
+    @Schema(description = "")
+    private MultipartFile pieceJointe;
 }

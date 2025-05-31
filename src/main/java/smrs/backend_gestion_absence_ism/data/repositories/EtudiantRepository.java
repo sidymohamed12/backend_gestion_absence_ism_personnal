@@ -7,4 +7,6 @@ import java.util.Optional;
 
 public interface EtudiantRepository extends MongoRepository<Etudiant, String> {
     Optional<Etudiant> findByMatricule(String matricule);
+
+    Optional<Etudiant> findByUtilisateurId(String utilisateurId);
 }

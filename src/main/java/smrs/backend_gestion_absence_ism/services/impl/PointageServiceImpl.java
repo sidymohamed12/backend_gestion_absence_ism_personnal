@@ -172,24 +172,33 @@ public class PointageServiceImpl implements PointageService {
     public List<HistoriquePointageMobileDto> getHistoriquePointage(String vigileId,
             LocalDate dateDebut,
             LocalDate dateFin) {
-        // Vérification du vigile
+
         vigileRepository.findById(vigileId)
                 .orElseThrow(() -> new EntityNotFoundException("Vigile non trouvé"));
 
-        LocalDateTime startDateTime = dateDebut.atStartOfDay();
-        LocalDateTime endDateTime = dateFin.atTime(23, 59, 59);
+        LocalDateTime startDate = (dateDebut != null)
+                ? dateDebut.atStartOfDay()
+                : LocalDateTime.now().minusDays(30);
 
-        // Récupérer tous les pointages dans la période
+        LocalDateTime endDate = (dateFin != null)
+                ? dateFin.atTime(23, 59, 59)
+                : LocalDateTime.now();
+
+        if (startDate.isAfter(endDate)) {
+            throw new IllegalArgumentException("La date de début doit être avant la date de fin");
+        }
+
         List<Absence> pointages = absenceRepository.findAll().stream()
                 .filter(a -> a.getVigile() != null && a.getVigile().getId().equals(vigileId))
-                .filter(a -> a.getHeurePointage().isAfter(startDateTime) &&
-                        a.getHeurePointage().isBefore(endDateTime))
+                .filter(a -> a.getHeurePointage().isAfter(startDate) &&
+                        a.getHeurePointage().isBefore(endDate))
                 .sorted((a, b) -> b.getHeurePointage().compareTo(a.getHeurePointage()))
                 .toList();
 
         return pointages.stream()
                 .map(pointageMobileMapper::toDto)
                 .toList();
+
     }
 
 }

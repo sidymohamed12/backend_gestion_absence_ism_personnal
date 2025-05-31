@@ -7,6 +7,7 @@ import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import lombok.RequiredArgsConstructor;
 import smrs.backend_gestion_absence_ism.data.enums.TypeAbsence;
@@ -17,12 +18,14 @@ import smrs.backend_gestion_absence_ism.mobile.dto.response.AbsenceMobileDto;
 import smrs.backend_gestion_absence_ism.mobile.dto.response.EtudiantAccueilMobileDto;
 import smrs.backend_gestion_absence_ism.mobile.dto.response.JustificationMobileDto;
 import smrs.backend_gestion_absence_ism.services.AbsenceService;
+import smrs.backend_gestion_absence_ism.services.JustificationService;
 
 @RestController
 @RequiredArgsConstructor
 public class MobileEtudiantControllerImpl implements MobileEtudiantController {
 
     private final AbsenceService absenceService;
+    private final JustificationService justificationService;
 
     @Override
     public ResponseEntity<Map<String, Object>> getInfoEtudiantConnectAccueil(String etudiantId) {
@@ -46,9 +49,12 @@ public class MobileEtudiantControllerImpl implements MobileEtudiantController {
     }
 
     @Override
-    public ResponseEntity<JustificationMobileDto> creerJustification(JustificationRequestDto justificationDto) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'creerJustification'");
+    public ResponseEntity<Map<String, Object>> creerJustification(JustificationRequestDto request,
+            MultipartFile document, String etudiantId) {
+        request.setPieceJointe(document);
+        JustificationMobileDto response = justificationService.ajouterJustification(request, etudiantId);
+        return new ResponseEntity<>(RestResponse.response(HttpStatus.CREATED, response, "JustificationMobileDTO"),
+                HttpStatus.CREATED);
     }
 
 }

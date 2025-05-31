@@ -1,0 +1,18 @@
+################################################
+GET http://localhost:8080/api/mobile/etudiant/10/absences
+################################################
+GET http://localhost:8080/api/mobile/etudiant/10
+################################################
+GET http://localhost:8080/api/mobile/vigile/3/historique
+################################################
+GET http://localhost:8080/api/mobile/vigile/etudiant/ISM2425/DK-0005
+#######################################
+POST http://localhost:8080/api/mobile/vigile/pointage
+Content-Type: application/json 
+
+  {
+    "matriculeEtudiant": "ISM2425/DK-0005",
+    "vigileId": "3"
+  }
+
+################

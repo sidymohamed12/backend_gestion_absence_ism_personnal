@@ -18,7 +18,6 @@ public interface JustificationMobileMapper {
     @Mapping(source = "absence.cours.jour", target = "jourCours")
     JustificationMobileDto toDto(Justification justification);
 
-    @Mapping(target = "documentPath", ignore = true)
-    @Mapping(target = "statut", constant = "EN_ATTENTE")
+    @Mapping(target = "adminValidateur", ignore = true)
     Justification toEntity(JustificationRequestDto dto);
 }
