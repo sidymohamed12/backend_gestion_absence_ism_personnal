@@ -2,6 +2,7 @@ package smrs.backend_gestion_absence_ism.security;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 @Slf4j
 @Component
@@ -48,10 +50,43 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private String parseJwt(HttpServletRequest request) {
         String headerAuth = request.getHeader("Authorization");
-
         if (StringUtils.hasText(headerAuth) && headerAuth.startsWith("Bearer ")) {
             return headerAuth.substring(7);
         }
+
+        // Si pas trouvé dans l'en-tête, chercher dans les cookies
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("jwt".equals(cookie.getName())) {
+                    String cookieValue = cookie.getValue();
+                    if (StringUtils.hasText(cookieValue)) {
+                        return cookieValue;
+                    }
+                }
+            }
+        }
+
+        // ...existing code...
+        // String token = null;
+
+        // // Lire le token depuis le cookie
+        // if (request.getCookies() != null) {
+        // for (Cookie cookie : request.getCookies()) {
+        // if ("token".equals(cookie.getName())) {
+        // token = cookie.getValue();
+        // break;
+        // }
+        // }
+        // }
+
+        // // Si pas trouvé dans le cookie, tu peux aussi vérifier le header si besoin
+        // if (token == null) {
+        // String authHeader = request.getHeader("Authorization");
+        // if (authHeader != null && authHeader.startsWith("Bearer ")) {
+        // return authHeader.substring(7);
+        // }
+        // }
 
         return null;
     }
