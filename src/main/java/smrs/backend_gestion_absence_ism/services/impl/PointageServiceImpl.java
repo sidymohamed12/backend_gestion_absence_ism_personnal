@@ -4,9 +4,10 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.format.TextStyle;
 import java.util.List;
-import java.util.Locale;
+import java.util.concurrent.CompletableFuture;
+
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
@@ -23,9 +24,7 @@ import smrs.backend_gestion_absence_ism.data.repositories.CoursRepository;
 import smrs.backend_gestion_absence_ism.data.repositories.EtudiantRepository;
 import smrs.backend_gestion_absence_ism.data.repositories.VigileRepository;
 import smrs.backend_gestion_absence_ism.mobile.dto.request.PointageRequestDto;
-import smrs.backend_gestion_absence_ism.mobile.dto.response.AbsenceMobileDto;
 import smrs.backend_gestion_absence_ism.mobile.dto.response.HistoriquePointageMobileDto;
-import smrs.backend_gestion_absence_ism.mobile.mapper.AbsenceMobileMapper;
 import smrs.backend_gestion_absence_ism.mobile.mapper.PointageMobileMapper;
 import smrs.backend_gestion_absence_ism.services.PointageService;
 import smrs.backend_gestion_absence_ism.utils.exceptions.EntityNotFoundException;
@@ -41,7 +40,6 @@ public class PointageServiceImpl implements PointageService {
     private final AbsenceRepository absenceRepository;
     private final AnneeScolaireRepository anneeScolaireRepository;
     private static final int TOLERANCE_RETARD_MINUTES = 15;
-    private final AbsenceMobileMapper absenceMobileMapper;
     private final PointageMobileMapper pointageMobileMapper;
 
     // --------------------------------- FONCTION PRIVATE POUR ADD POINTAGE
@@ -99,9 +97,12 @@ public class PointageServiceImpl implements PointageService {
 
     /**
      * pour enregistrer pointage
+     * 
+     * @param request pointageRequest
      */
+    @Async
     @Override
-    public AbsenceMobileDto effectuerPointage(PointageRequestDto request) {
+    public CompletableFuture<HistoriquePointageMobileDto> effectuerPointage(PointageRequestDto request) {
 
         Etudiant etudiant = etudiantRepository.findByMatricule(request.getMatriculeEtudiant())
                 .orElseThrow(() -> new EntityNotFoundException("Étudiant non trouvé"));
@@ -111,18 +112,17 @@ public class PointageServiceImpl implements PointageService {
 
         // on calcule la date à la quelle on est et on récupére aussi le jour
         LocalDateTime maintenant = LocalDateTime.now();
-        LocalDate aujourdhui = maintenant.toLocalDate();
-        String jourActuel = aujourdhui.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.FRENCH);
 
         // on récupère l'année encours
         AnneeScolaire anneeScolaire = anneeScolaireRepository.findByActive(Boolean.TRUE);
         if (anneeScolaire == null) {
-            throw new EntityNotFoundException("Aucune année scolaire active");
+            log.warn("Aucune année scolaire active");
+            return CompletableFuture.completedFuture(null);
         }
 
         // on doit verifier si l'etudiant à cours ajourd'hui
-        List<Cours> coursAujourdhui = coursRepository.findByClasseIdAndJourAndCurrentYearId(
-                etudiant.getClasse().getId(), jourActuel, anneeScolaire.getId());
+        List<Cours> coursAujourdhui = coursRepository.findByClasseIdAndDateAndCurrentYearId(
+                etudiant.getClasse().getId(), LocalDate.now(), anneeScolaire.getId());
 
         if (coursAujourdhui.isEmpty()) {
             log.info("Aucun cours aujourd'hui pour l'étudiant {}, pointage historique seulement",
@@ -132,8 +132,9 @@ public class PointageServiceImpl implements PointageService {
             absence.setType(TypeAbsence.PRESENT);
             absence.setEtudiant(etudiant);
             absence.setVigile(vigile);
+            absence.onPrePersist();
             absenceRepository.save(absence);
-            return absenceMobileMapper.toMobileDto(absence);
+            return CompletableFuture.completedFuture(pointageMobileMapper.toHistoriquePointageMobileDto(absence));
         }
 
         // Trouver le cours en cours ou à venir
@@ -141,14 +142,15 @@ public class PointageServiceImpl implements PointageService {
 
         // on regarde si l'etudiant a deja ete pointe
         if (absenceRepository.existsByEtudiantIdAndCoursId(etudiant.getId(), coursActuel.getId())) {
-            throw new IllegalStateException("Étudiant déjà pointé pour ce cours");
+            log.warn("Étudiant déjà pointé pour ce cours");
+            return CompletableFuture.completedFuture(null);
         }
 
         // Calculer le retard et déterminer le type d'absence
         LocalTime heureDebut = coursActuel.getHeureDebut();
         LocalTime heureArrivee = maintenant.toLocalTime();
 
-        int minutesRetard = calculerMinutesRetard(heureDebut, heureArrivee);
+        Integer minutesRetard = calculerMinutesRetard(heureDebut, heureArrivee);
         TypeAbsence typeAbsence = determinerTypeAbsence(minutesRetard);
 
         // Créer l'absence/présence
@@ -160,9 +162,10 @@ public class PointageServiceImpl implements PointageService {
         absence.setCours(coursActuel);
         absence.setVigile(vigile);
         absence.setDuree(Duration.between(heureDebut, heureArrivee).toMinutes() > 0 ? heureArrivee : heureDebut);
+        absence.onPrePersist();
         absenceRepository.save(absence);
 
-        return absenceMobileMapper.toMobileDto(absence);
+        return CompletableFuture.completedFuture(pointageMobileMapper.toHistoriquePointageMobileDto(absence));
 
     }
 
@@ -170,33 +173,36 @@ public class PointageServiceImpl implements PointageService {
      * Récupère l'historique de pointage pour un vigile
      */
     public List<HistoriquePointageMobileDto> getHistoriquePointage(String vigileId,
-            LocalDate dateDebut,
-            LocalDate dateFin) {
+            // LocalDate dateDebut,
+            // LocalDate dateFin,
+            LocalDate date,
+            String etudiantMatricule) {
 
         vigileRepository.findById(vigileId)
                 .orElseThrow(() -> new EntityNotFoundException("Vigile non trouvé"));
 
-        LocalDateTime startDate = (dateDebut != null)
-                ? dateDebut.atStartOfDay()
-                : LocalDateTime.now().minusDays(30);
+        LocalDateTime startOfDay = date != null
+                ? date.atStartOfDay()
+                : LocalDateTime.now().minusDays(30).withHour(0).withMinute(0);
 
-        LocalDateTime endDate = (dateFin != null)
-                ? dateFin.atTime(23, 59, 59)
+        LocalDateTime endOfDay = date != null
+                ? date.atTime(23, 59, 59)
                 : LocalDateTime.now();
 
-        if (startDate.isAfter(endDate)) {
-            throw new IllegalArgumentException("La date de début doit être avant la date de fin");
-        }
+        List<Absence> pointages = absenceRepository.findByVigileIdOrderByHeurePointageDesc(vigileId);
 
-        List<Absence> pointages = absenceRepository.findAll().stream()
-                .filter(a -> a.getVigile() != null && a.getVigile().getId().equals(vigileId))
-                .filter(a -> a.getHeurePointage().isAfter(startDate) &&
-                        a.getHeurePointage().isBefore(endDate))
-                .sorted((a, b) -> b.getHeurePointage().compareTo(a.getHeurePointage()))
+        List<Absence> filteredPointages = pointages.stream()
+                .filter(a -> a.getHeurePointage().isAfter(startOfDay) &&
+                        a.getHeurePointage().isBefore(endOfDay))
+                .filter(a -> etudiantMatricule == null || etudiantMatricule.isEmpty() ||
+                        (a.getEtudiant() != null &&
+                                a.getEtudiant().getMatricule() != null &&
+                                a.getEtudiant().getMatricule().toLowerCase()
+                                        .contains(etudiantMatricule.toLowerCase())))
                 .toList();
 
-        return pointages.stream()
-                .map(pointageMobileMapper::toDto)
+        return filteredPointages.stream()
+                .map(pointageMobileMapper::toHistoriquePointageMobileDto)
                 .toList();
 
     }

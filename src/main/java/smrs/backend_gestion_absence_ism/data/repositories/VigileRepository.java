@@ -9,4 +9,5 @@ public interface VigileRepository extends MongoRepository<Vigile, String> {
     Optional<Vigile> findByBadge(String badge);
 
     Optional<Vigile> findByUtilisateurId(String utilisateurId);
+
 }

@@ -23,12 +23,8 @@ import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
 
-/**
- * Génère des données de test pour les absences
- */
-
-@Component
-@Order(7)
+// @Component
+// @Order(7)
 @RequiredArgsConstructor
 public class AbsenceMock implements CommandLineRunner {
 

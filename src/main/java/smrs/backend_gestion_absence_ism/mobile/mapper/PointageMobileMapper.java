@@ -17,5 +17,6 @@ public interface PointageMobileMapper {
     @Mapping(source = "cours.nom", target = "coursNom")
     @Mapping(source = "heurePointage", target = "heureArrivee", dateFormat = "HH:mm")
     @Mapping(source = "heurePointage", target = "date", dateFormat = "yyyy-MM-dd")
-    HistoriquePointageMobileDto toDto(Absence absence);
+    @Mapping(source = "type", target = "typeAbsence")
+    HistoriquePointageMobileDto toHistoriquePointageMobileDto(Absence absence);
 }

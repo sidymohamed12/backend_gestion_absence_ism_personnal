@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -22,6 +23,7 @@ public class Cours extends AbstractEntity {
     private LocalTime heureDebut;
     private LocalTime heureFin;
     private String jour;
+    private LocalDate date;
     @DBRef(lazy = true)
     private Matiere matiere;
     @DBRef(lazy = true)

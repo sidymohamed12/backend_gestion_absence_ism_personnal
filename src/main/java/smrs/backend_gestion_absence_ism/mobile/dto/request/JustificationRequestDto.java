@@ -1,6 +1,6 @@
 package smrs.backend_gestion_absence_ism.mobile.dto.request;
 
-import org.springframework.web.multipart.MultipartFile;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -24,6 +24,6 @@ public class JustificationRequestDto {
     private String description;
 
     @JsonIgnore
-    @Schema(description = "")
-    private MultipartFile pieceJointe;
+    @Schema(description = "Liste des pièces jointes associées à la justification", example = "[\"certificat_medical.pdf\", \"ordonnance.pdf\"]")
+    private List<String> pieceJointes;
 }

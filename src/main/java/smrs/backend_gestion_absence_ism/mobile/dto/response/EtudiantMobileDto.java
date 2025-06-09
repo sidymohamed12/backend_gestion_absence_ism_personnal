@@ -5,8 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import smrs.backend_gestion_absence_ism.data.entities.Classe;
-import smrs.backend_gestion_absence_ism.data.entities.Utilisateur;
 
 @Getter
 @Setter

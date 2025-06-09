@@ -3,6 +3,7 @@ package smrs.backend_gestion_absence_ism.mobile.dto.response;
 import smrs.backend_gestion_absence_ism.data.enums.StatutJustification;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -25,8 +26,8 @@ public class JustificationMobileDto {
     @Schema(description = "Description de la justification", example = "Rendez-vous médical")
     private String description;
 
-    @Schema(description = "Chemin vers le document justificatif", example = "/docs/justifications/doc123.pdf")
-    private String documentPath;
+    @Schema(description = "Liste des pièces jointes", example = "[\"piece1.jpg\", \"piece2.pdf\"]")
+    private List<String> piecesJointes;
 
     @Schema(description = "Statut de la justification", example = "EN_ATTENTE")
     private StatutJustification statut;

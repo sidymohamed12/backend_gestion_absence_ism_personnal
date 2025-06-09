@@ -18,6 +18,13 @@ public interface JustificationMobileMapper {
     @Mapping(source = "absence.cours.jour", target = "jourCours")
     JustificationMobileDto toDto(Justification justification);
 
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "createdAt", expression = "java(java.time.LocalDateTime.now())")
+    @Mapping(target = "updatedAt", expression = "java(java.time.LocalDateTime.now())")
+    @Mapping(target = "statut", constant = "EN_ATTENTE")
+    @Mapping(target = "absence", ignore = true)
     @Mapping(target = "adminValidateur", ignore = true)
+    @Mapping(target = "piecesJointes", ignore = true)
+    @Mapping(target = "dateValidation", ignore = true)
     Justification toEntity(JustificationRequestDto dto);
 }

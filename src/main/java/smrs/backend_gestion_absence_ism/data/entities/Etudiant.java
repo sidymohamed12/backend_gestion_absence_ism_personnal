@@ -8,6 +8,7 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
@@ -25,10 +26,10 @@ public class Etudiant extends AbstractEntity {
     private Classe classe;
 
     @DBRef(lazy = true)
-    private List<Absence> absences;
+    private List<Absence> absences = new ArrayList<>();
 
     @DBRef(lazy = true)
-    private List<Inscription> inscriptions;
+    private List<Inscription> inscriptions = new ArrayList<>();
 
 }
 

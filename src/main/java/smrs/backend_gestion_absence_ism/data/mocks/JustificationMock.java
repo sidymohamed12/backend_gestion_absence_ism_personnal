@@ -6,6 +6,7 @@ import smrs.backend_gestion_absence_ism.data.enums.StatutJustification;
 import smrs.backend_gestion_absence_ism.data.repositories.AdminRepository;
 import smrs.backend_gestion_absence_ism.data.repositories.JustificationRepository;
 
+import java.util.Collections;
 import java.util.Random;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
@@ -13,11 +14,8 @@ import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
 
-/**
- * Génère des données de test pour les justifications
- */
-@Component
-@Order(5)
+// @Component
+// @Order(5)
 @RequiredArgsConstructor
 public class JustificationMock implements CommandLineRunner {
     private final JustificationRepository justificationRepository;
@@ -59,7 +57,7 @@ public class JustificationMock implements CommandLineRunner {
                 Justification justification = new Justification();
                 justification.setId(String.valueOf(i + 1));
                 justification.setDescription(descriptions[random.nextInt(descriptions.length)]);
-                justification.setDocumentPath(documents[random.nextInt(documents.length)]);
+                justification.setPiecesJointes(Collections.singletonList(documents[random.nextInt(documents.length)]));
                 justification.setStatut(StatutJustification.EN_ATTENTE);
                 justification.setDateValidation(null);
                 justification.setAdminValidateur(admin);

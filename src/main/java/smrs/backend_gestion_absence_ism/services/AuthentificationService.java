@@ -12,4 +12,5 @@ public interface AuthentificationService {
     LoginResponseDto login(LoginRequestDTO loginRequest);
 
     void logout();
+
 }

@@ -9,8 +9,8 @@ import smrs.backend_gestion_absence_ism.data.entities.Classe;
 import smrs.backend_gestion_absence_ism.data.enums.Filiere;
 import smrs.backend_gestion_absence_ism.data.repositories.ClasseRepository;
 
-@Component
-@Order(3)
+// @Component
+// @Order(3)
 @RequiredArgsConstructor
 public class ClasseMock implements CommandLineRunner {
 

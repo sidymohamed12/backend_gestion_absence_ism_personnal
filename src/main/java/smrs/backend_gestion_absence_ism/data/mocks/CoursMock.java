@@ -9,8 +9,11 @@ import smrs.backend_gestion_absence_ism.data.repositories.ClasseRepository;
 import smrs.backend_gestion_absence_ism.data.repositories.CoursRepository;
 import smrs.backend_gestion_absence_ism.data.repositories.MatiereRepository;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.format.TextStyle;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
 
 import org.springframework.boot.CommandLineRunner;
@@ -19,12 +22,8 @@ import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
 
-/**
- * Génère des données de test pour les cours
- */
-
-@Component
-@Order(6)
+// @Component
+// @Order(6)
 @RequiredArgsConstructor
 public class CoursMock implements CommandLineRunner {
 
@@ -78,8 +77,8 @@ public class CoursMock implements CommandLineRunner {
 
                 cours.setHeureDebut(heureDebut);
                 cours.setHeureFin(heureFin);
-                cours.setJour(i % 2 == 0 ? "Mardi"
-                        : i % 3 == 0 ? "Mercredi" : i % 4 == 0 ? "Jeudi" : i % 5 == 0 ? "Vendredi" : "Lundi");
+                cours.setDate(LocalDate.now());
+                cours.setJour(cours.getDate().getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.FRENCH));
 
                 cours.setMatiere(matieres.get(random.nextInt(matieres.size())));
                 cours.setClasse(classes.get(random.nextInt(classes.size())));

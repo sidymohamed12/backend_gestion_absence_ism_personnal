@@ -12,6 +12,10 @@ public interface AbsenceMobileMapper {
     AbsenceMobileMapper INSTANCE = Mappers.getMapper(AbsenceMobileMapper.class);
 
     @Mapping(expression = "java(absence.getJustification() != null)", target = "justification")
+    @Mapping(target = "nomCours", source = "absence.cours.nom")
+    @Mapping(target = "professeur", source = "absence.cours.enseignant")
+    @Mapping(target = "salle", source = "absence.cours.salle")
+    @Mapping(target = "heureDebut", source = "absence.cours.heureDebut")
     AbsenceMobileDto toMobileDto(Absence absence);
 
 }

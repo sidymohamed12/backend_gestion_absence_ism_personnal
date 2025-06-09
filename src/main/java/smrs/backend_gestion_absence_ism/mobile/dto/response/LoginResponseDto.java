@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import smrs.backend_gestion_absence_ism.data.enums.Role;
 
 @Getter
 @Setter
@@ -17,13 +18,13 @@ public class LoginResponseDto {
     @Schema(description = "Token JWT", example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...")
     private String token;
 
-    private String accessToken;
-    private String refreshToken;
-
     @Schema(description = "Type de token", example = "Bearer")
     @Builder.Default
     private String type = "Bearer";
 
     @Schema(description = "Informations utilisateur")
     private UtilisateurMobileDto utilisateur;
+
+    private String realId;
+    private String redirectEndpoint;
 }

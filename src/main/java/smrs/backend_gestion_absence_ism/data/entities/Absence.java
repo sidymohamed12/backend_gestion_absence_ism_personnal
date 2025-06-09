@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
+
 import smrs.backend_gestion_absence_ism.data.enums.TypeAbsence;
 
 import java.time.LocalDateTime;

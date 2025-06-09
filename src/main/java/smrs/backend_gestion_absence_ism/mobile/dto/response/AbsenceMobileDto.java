@@ -1,6 +1,7 @@
 package smrs.backend_gestion_absence_ism.mobile.dto.response;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -28,7 +29,19 @@ public class AbsenceMobileDto {
     @Schema(description = "Type d'absence : ABSENCE_COMPLETE ou RETARD", example = "RETARD")
     private TypeAbsence type;
 
-    private CoursMobileDto cours;
+    // private CoursMobileDto cours;
+
+    @Schema(description = "Nom du cours", example = "Architecture des systèmes")
+    private String nomCours;
+
+    @Schema(description = "Nom de l'enseignant", example = "Pr. DIOP")
+    private String professeur;
+
+    @Schema(description = "Salle du cours", example = "302")
+    private String salle;
+
+    @Schema(description = "l'heure de debut du cours", example = "14:00")
+    private LocalTime heureDebut;
 
     @Schema(description = "Si la justification est présente", example = "true")
     private boolean justification;

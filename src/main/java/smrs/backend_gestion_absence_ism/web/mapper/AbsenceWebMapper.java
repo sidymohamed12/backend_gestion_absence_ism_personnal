@@ -12,9 +12,13 @@ import java.util.List;
 public interface AbsenceWebMapper {
     AbsenceWebMapper INSTANCE = Mappers.getMapper(AbsenceWebMapper.class);
 
-    // @Mapping(source = "etudiant.matricule", target = "etudiantMatricule")
-    // @Mapping(source = "cours.nom", target = "coursNom")
-    @Mapping(expression = "java(absence.getJustification() != null)", target = "AJustification")
+    @Mapping(source = "cours.nom", target = "coursNom")
+    @Mapping(target = "etudiantNom", source = "etudiant.utilisateur.nom")
+    @Mapping(target = "etudiantPrenom", source = "etudiant.utilisateur.prenom")
+    @Mapping(target = "etudiantMatricule", source = "etudiant.matricule")
+    @Mapping(target = "justification", source = "justification.statut")
+    @Mapping(target = "salleNom", source = "cours.salle")
+    @Mapping(target = "coursJour", source = "cours.jour")
     AbsenceWebDto toDto(Absence absence);
 
     List<AbsenceWebDto> toDtoList(List<Absence> absences);

@@ -6,12 +6,15 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
+
 import smrs.backend_gestion_absence_ism.data.enums.Role;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Document(collection = "utilisateurs")
 public class Utilisateur extends AbstractEntity {
     private String nom;
     private String prenom;

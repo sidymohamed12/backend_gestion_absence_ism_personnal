@@ -16,3 +16,14 @@ Content-Type: application/json
   }
 
 ################
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json 
+
+  {
+    "email": "admin1@ism.edu.sn",
+    "motDePasse": "admin123"
+  }
+################
+GET http://localhost:8080/api/web/absences/annee-active
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbjFAaXNtLmVkdS5zbiIsImlhdCI6MTc0OTQzMjUyOCwiZXhwIjoxNzQ5NDM2MTI4fQ.c79QdbiMjkaIPTN2el0_yO9IbmRy7IQm6LXSS0Wujdmjdh9NROA2ofBUOMvSlVDrLxV4ukYmgkd_J1nYJV9BNg
+################################################

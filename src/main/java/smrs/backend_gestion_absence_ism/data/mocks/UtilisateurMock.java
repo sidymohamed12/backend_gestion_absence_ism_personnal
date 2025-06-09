@@ -20,11 +20,8 @@ import smrs.backend_gestion_absence_ism.data.repositories.VigileRepository;
 
 import java.util.List;
 
-/**
- * Génère des données de test pour les utilisateurs (Admin, Etudiant, Vigile)
- */
-@Component
-@Order(4)
+// @Component
+// @Order(4)
 @RequiredArgsConstructor
 public class UtilisateurMock implements CommandLineRunner {
 
