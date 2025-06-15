@@ -3,7 +3,11 @@ GET http://localhost:8080/api/mobile/etudiant/10/absences
 ################################################
 GET http://localhost:8080/api/mobile/etudiant/10
 ################################################
-GET http://localhost:8080/api/mobile/vigile/3/historique
+GET http://localhost:8080/api/mobile/etudiant/justification/3
+################################################
+GET http://localhost:8080/api/mobile/vigile/3
+################################################
+GET http://localhost:8080/api/mobile/vigile/4/historique?etudiantMatricule=ISM2425/DK-0001
 ################################################
 GET http://localhost:8080/api/mobile/vigile/etudiant/ISM2425/DK-0005
 #######################################
@@ -11,19 +15,68 @@ POST http://localhost:8080/api/mobile/vigile/pointage
 Content-Type: application/json 
 
   {
-    "matriculeEtudiant": "ISM2425/DK-0005",
-    "vigileId": "3"
+    "matriculeEtudiant": "ISM2425/DK-0002",
+    "vigileId": "4"
   }
 
 ################
-POST http://localhost:8080/api/auth/login
+POST http://localhost:8080/api/mobile/auth/login
+Content-Type: application/json 
+
+  {
+    "email": "mame@ism.edu.sn",
+    "motDePasse": "etudiant123"
+  }
+
+################
+POST http://localhost:8080/api/web/auth/login
 Content-Type: application/json 
 
   {
     "email": "admin1@ism.edu.sn",
     "motDePasse": "admin123"
   }
-################
+
+############
 GET http://localhost:8080/api/web/absences/annee-active
-Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbjFAaXNtLmVkdS5zbiIsImlhdCI6MTc0OTQ0NTIxOCwiZXhwIjoxNzQ5NDQ4ODE4fQ.ECELt-Qk-_p8g8sU0Y5LQGPorSoe0aNuBJuX0L4rKkXBUDn6Nvcim7H44xnhAkagumWs1AVn6kHLYN81A3eTdg
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbjFAaXNtLmVkdS5zbiIsImlhdCI6MTc1MDAxMzE5OCwiZXhwIjoxNzUwMDE2Nzk4fQ.pc-IhMBh8EV5UAkL8jXHBEL4Dss8ENf0H2oqb4QYqKJMN6fNJN-w9hMU2dtpUrT7bEoRe8mTEw7Xw8o-de2VwA
+#################################
+GET http://localhost:8080/api/web/absences/5
+
+###############
+POST http://localhost:8080/api/mobile/etudiant/justification
+Content-Type: application/json 
+
+{
+  "absenceId": "2",
+  "description": "J'étais malade ce jour-là et je n'ai pas pu assister au cours",
+  "piecesJointes": [
+    "https://hxtdyxlhxmecheddfedt.supabase.co/storage/v1/object/public/justifications/user123/1716548762_certificat.pdf",
+    "https://hxtdyxlhxmecheddfedt.supabase.co/storage/v1/object/public/justifications/user123/1716548764_ordonnance.jpg"
+  ]
+}
+
+###############
+PATCH http://localhost:8080/api/web/admin/justification/3
+Content-Type: application/json
+
+{
+  "justificationId" : "5",
+  "statut" : "VALIDEE",
+  "adminValidateurId" : "1"
+}
+
+####
+GET http://localhost:8080/api/web/vigile
+#########
+GET http://localhost:8080/api/web/etudiants
+#########
+GET http://localhost:8080/api/web/classes
 ################################################
+GET http://localhost:8080/api/web/vigile/4/historique
+################################################
+GET http://localhost:8080/api/web/absences/annee-active?page=0
+################################################
+GET http://localhost:8080/api/web/classes/2/etudiants
+################################################
+GET http://localhost:8080/api/web/classes/2

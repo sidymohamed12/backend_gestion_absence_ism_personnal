@@ -8,8 +8,8 @@ import lombok.RequiredArgsConstructor;
 import smrs.backend_gestion_absence_ism.data.entities.Matiere;
 import smrs.backend_gestion_absence_ism.data.repositories.MatiereRepository;
 
-// @Component
-// @Order(1)
+@Component
+@Order(1)
 @RequiredArgsConstructor
 public class MatiereMock implements CommandLineRunner {
 

@@ -15,7 +15,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Schema(description = "Détails d’une justification mobile")
+@Schema(description = "Détails d'une justification mobile")
 public class JustificationMobileDto {
     @Schema(description = "ID de la justification", example = "663bd21f9f5c4c7d88ab8888")
     private String id;

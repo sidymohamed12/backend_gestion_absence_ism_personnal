@@ -25,4 +25,6 @@ public interface ClasseService {
      */
     List<Classe> getClassesForActiveAcademicYear();
 
+    ClasseWebDto getClasseById(String classeId);
+
 }

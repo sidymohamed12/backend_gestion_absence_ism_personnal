@@ -28,7 +28,7 @@ public class Cours extends AbstractEntity {
     private Matiere matiere;
     @DBRef(lazy = true)
     private Classe classe;
-    private boolean pointageFerme = false; // Si true, génération des absences faite
+    private boolean pointageFerme = false;
 
     @DBRef
     private AnneeScolaire currentYear;

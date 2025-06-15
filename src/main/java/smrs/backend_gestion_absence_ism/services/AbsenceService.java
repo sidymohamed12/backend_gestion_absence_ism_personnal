@@ -11,6 +11,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 public interface AbsenceService {
     List<Absence> getAllAbsences();
 
@@ -28,8 +31,8 @@ public interface AbsenceService {
             TypeAbsence type,
             LocalDate date,
             String coursNom);
-            
+
     AbsenceDetailWithJustificationDto getAbsenceDetailWithJustification(String absenceId);
-    
-    List<AbsenceWebDto> getAbsencesForActiveYear();
+
+    Page<AbsenceWebDto> getAllAbsences(Pageable pageable, TypeAbsence typeAbsence, LocalDate date);
 }

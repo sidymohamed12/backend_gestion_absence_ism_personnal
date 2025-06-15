@@ -23,7 +23,6 @@ public class JustificationRequestDto {
     @Schema(description = "Description de la justification", example = "Maladie avec certificat médical")
     private String description;
 
-    @JsonIgnore
     @Schema(description = "Liste des pièces jointes associées à la justification", example = "[\"certificat_medical.pdf\", \"ordonnance.pdf\"]")
-    private List<String> pieceJointes;
+    private List<String> piecesJointes;
 }

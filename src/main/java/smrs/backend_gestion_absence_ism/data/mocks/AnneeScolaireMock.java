@@ -10,8 +10,8 @@ import lombok.RequiredArgsConstructor;
 import smrs.backend_gestion_absence_ism.data.entities.AnneeScolaire;
 import smrs.backend_gestion_absence_ism.data.repositories.AnneeScolaireRepository;
 
-// @Component
-// @Order(2)
+@Component
+@Order(2)
 @RequiredArgsConstructor
 public class AnneeScolaireMock implements CommandLineRunner {
 

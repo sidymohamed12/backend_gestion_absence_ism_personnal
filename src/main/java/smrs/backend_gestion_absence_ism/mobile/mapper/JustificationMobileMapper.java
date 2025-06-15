@@ -22,9 +22,9 @@ public interface JustificationMobileMapper {
     @Mapping(target = "createdAt", expression = "java(java.time.LocalDateTime.now())")
     @Mapping(target = "updatedAt", expression = "java(java.time.LocalDateTime.now())")
     @Mapping(target = "statut", constant = "EN_ATTENTE")
+    @Mapping(target = "piecesJointes", source = "piecesJointes")
     @Mapping(target = "absence", ignore = true)
     @Mapping(target = "adminValidateur", ignore = true)
-    @Mapping(target = "piecesJointes", ignore = true)
     @Mapping(target = "dateValidation", ignore = true)
     Justification toEntity(JustificationRequestDto dto);
 }

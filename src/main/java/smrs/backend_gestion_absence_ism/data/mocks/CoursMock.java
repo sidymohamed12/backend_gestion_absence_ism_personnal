@@ -22,8 +22,8 @@ import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
 
-// @Component
-// @Order(6)
+@Component
+@Order(6)
 @RequiredArgsConstructor
 public class CoursMock implements CommandLineRunner {
 

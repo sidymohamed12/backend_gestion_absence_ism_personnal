@@ -23,8 +23,8 @@ import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
 
-// @Component
-// @Order(7)
+@Component
+@Order(7)
 @RequiredArgsConstructor
 public class AbsenceMock implements CommandLineRunner {
 

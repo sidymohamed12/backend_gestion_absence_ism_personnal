@@ -15,8 +15,8 @@ import smrs.backend_gestion_absence_ism.data.repositories.AnneeScolaireRepositor
 import smrs.backend_gestion_absence_ism.data.repositories.EtudiantRepository;
 import smrs.backend_gestion_absence_ism.data.repositories.InscriptionRepository;
 
-// @Component
-// @Order(8)
+@Component
+@Order(8)
 @RequiredArgsConstructor
 public class InscriptionMock implements CommandLineRunner {
 

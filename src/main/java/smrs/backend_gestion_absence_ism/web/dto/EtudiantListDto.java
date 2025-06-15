@@ -12,4 +12,5 @@ public class EtudiantListDto {
     private String nom;
     private String prenom;
     private String matricule;
+    private String email;
 }

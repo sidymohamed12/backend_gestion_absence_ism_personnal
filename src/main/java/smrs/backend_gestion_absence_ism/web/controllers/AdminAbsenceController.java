@@ -1,12 +1,14 @@
 package smrs.backend_gestion_absence_ism.web.controllers;
 
-import java.util.List;
+import java.time.LocalDate;
+import java.util.Map;
 
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -15,12 +17,12 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import smrs.backend_gestion_absence_ism.data.enums.TypeAbsence;
 import smrs.backend_gestion_absence_ism.web.dto.AbsenceDetailWithJustificationDto;
 import smrs.backend_gestion_absence_ism.web.dto.AbsenceWebDto;
 
 @Tag(name = "Web - Admin Absences", description = "API pour la gestion des absences par l'administrateur")
 @RequestMapping("/api/web/absences")
-@PreAuthorize("hasRole('ADMIN')")
 public interface AdminAbsenceController {
 
     @Operation(summary = "Détails d'une absence", description = "Récupère les détails d'une absence spécifique et sa justification associée si elle existe")
@@ -40,5 +42,10 @@ public interface AdminAbsenceController {
             @ApiResponse(responseCode = "500", description = "Erreur serveur")
     })
     @GetMapping("/annee-active")
-    ResponseEntity<List<AbsenceWebDto>> getAbsencesForActiveYear();
+    ResponseEntity<Map<String, Object>> getAbsencesForActiveYear(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "4") int size,
+            @Parameter(description = "Type Absence pour le filtrage (optionnel)") @RequestParam(value = "typeAbsence", required = false) TypeAbsence typeAbsence,
+            @Parameter(description = "Date pour le filtrage (optionnel)") @RequestParam(value = "date", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date);
+
 }

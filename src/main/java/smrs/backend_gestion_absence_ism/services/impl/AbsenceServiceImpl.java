@@ -1,5 +1,8 @@
 package smrs.backend_gestion_absence_ism.services.impl;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
@@ -37,6 +40,8 @@ public class AbsenceServiceImpl implements AbsenceService {
 
     /**
      * récupérer toutes les absences
+     * 
+     * @return List<Absence>, la liste de toutes les absences
      */
     @Override
     public List<Absence> getAllAbsences() {
@@ -45,6 +50,9 @@ public class AbsenceServiceImpl implements AbsenceService {
 
     /**
      * récupérer les absences d'un étudiant par son id
+     * 
+     * @param etudiantId, l'id de l'étudiant
+     * @return List<Absence>, la liste des absences de l'étudiant
      */
     @Override
     public List<Absence> getAbsencesByEtudiant(String etudiantId) {
@@ -55,6 +63,9 @@ public class AbsenceServiceImpl implements AbsenceService {
 
     /**
      * récupérer les absences d'un étudiant par son matricule
+     * 
+     * @param matricule, le matricule de l'étudiant
+     * @return List<Absence>, la liste des absences de l'étudiant
      */
     @Override
     public List<Absence> getAbsencesByEtudiantMatricule(String matricule) {
@@ -62,9 +73,10 @@ public class AbsenceServiceImpl implements AbsenceService {
     }
 
     /**
-     * récupére les absences date
+     * récupére les absences d'une date donné
      * 
      * @param date
+     * @return List<Absence>, la liste des absences créées à cette date
      */
     @Override
     public List<Absence> getAbsencesByDate(LocalDateTime date) {
@@ -75,6 +87,7 @@ public class AbsenceServiceImpl implements AbsenceService {
      * récupére les absences par l'id cours
      * 
      * @param coursId, l'id du cours
+     * @return List<Absence>, la liste des absences pour ce cours
      */
     @Override
     public List<Absence> getAbsencesByCours(String coursId) {
@@ -85,6 +98,7 @@ public class AbsenceServiceImpl implements AbsenceService {
      * on envoie les infos de l'etudiant avec les 5 derniers absences
      * 
      * @param etudiantId, l'id de l'étudiant
+     * @return EtudiantAccueilMobileDto, les infos de l'étudiant et ses absences
      */
     @Override
     public EtudiantAccueilMobileDto getAccueilEtudiant(String etudiantId) {
@@ -122,6 +136,7 @@ public class AbsenceServiceImpl implements AbsenceService {
      * @param type       le type d'absence
      * @param date       une date spécifique
      * @param coursNom   le nom du cours
+     * @return List<AbsenceMobileDto>, la liste des absences de l'étudiant
      */
     @Override
     public List<AbsenceMobileDto> getAbsencesEtudiant(String etudiantId, TypeAbsence type,
@@ -177,6 +192,8 @@ public class AbsenceServiceImpl implements AbsenceService {
      * récupére les infos de l'absence et celle des justification
      * 
      * @param absenceId l'id de l'absence
+     * @return AbsenceDetailWithJustificationDto, les détails de l'absence avec la
+     *         justification
      */
     @Override
     public AbsenceDetailWithJustificationDto getAbsenceDetailWithJustification(String absenceId) {
@@ -190,43 +207,62 @@ public class AbsenceServiceImpl implements AbsenceService {
     }
 
     /**
+     * récupére les absences de l'années active
      * 
+     * @param pageable, la pagination
+     * @return Page<AbsenceWebDto>, la page des absences
      */
     @Override
-    public List<AbsenceWebDto> getAbsencesForActiveYear() {
-        try {
-            // Récupérer l'année scolaire active
-            AnneeScolaire activeYear = anneeScolaireRepository.findByActive(Boolean.TRUE);
-            if (activeYear == null) {
-                throw new EntityNotFoundException("Aucune année scolaire active n'est configurée");
-            }
+    public Page<AbsenceWebDto> getAllAbsences(Pageable pageable, TypeAbsence typeAbsence, LocalDate date) {
+        AnneeScolaire activeYear = getActiveYear();
 
-            // Récupérer toutes les absences
-            List<Absence> allAbsences = absenceRepository.findAll();
+        // Récupérer toutes les absences de l'année active, hors "PRESENT"
+        List<Absence> absences = absenceRepository.findAll().stream()
+                .filter(absence -> absence.getType() != TypeAbsence.PRESENT
+                        && absence.getCours() != null
+                        && absence.getCours().getCurrentYear() != null
+                        && absence.getCours().getCurrentYear().getId().equals(activeYear.getId()))
+                .toList();
 
-            // Filtrer les absences des étudiants inscrits pour l'année active
-            allAbsences.stream()
-                    .filter(absence -> {
-                        Etudiant etudiant = absence.getEtudiant();
-                        if (etudiant == null) {
-                            return false;
-                        }
-
-                        // Vérifier si l'étudiant a une inscription valide pour l'année active
-                        return etudiant.getInscriptions().stream()
-                                .anyMatch(inscription -> inscription.getAnneeScolaire() != null &&
-                                        inscription.getAnneeScolaire().isActive() &&
-                                        inscription.isValide());
-                    }).sorted(Comparator.comparing(Absence::getHeurePointage).reversed()).toList();
-
-            // Convertir en DTO
-            return allAbsences.stream()
-                    .map(AbsenceWebMapper.INSTANCE::toDto)
+        // Filtrer par type d'absence si précisé
+        if (typeAbsence != null) {
+            absences = absences.stream()
+                    .filter(absence -> absence.getType() == typeAbsence)
                     .toList();
-
-        } catch (Exception e) {
-            throw new RuntimeException(
-                    "Erreur lors de la récupération des absences pour l'année active : " + e.getMessage(), e);
         }
+
+        // Filtrer par date si précisé
+        if (date != null) {
+            absences = absences.stream()
+                    .filter(absence -> absence.getHeurePointage() != null &&
+                            absence.getHeurePointage().toLocalDate().isEqual(date))
+                    .toList();
+        }
+
+        // Mapper et trier
+        List<AbsenceWebDto> dtos = absences.stream()
+                .map(AbsenceWebMapper.INSTANCE::toDto)
+                .sorted(Comparator.comparing(AbsenceWebDto::getCreatedAt).reversed())
+                .toList();
+
+        // Pagination adaptée
+        int start = (int) pageable.getOffset();
+        int end = Math.min(start + pageable.getPageSize(), dtos.size());
+        List<AbsenceWebDto> pageContent = (start < end) ? dtos.subList(start, end) : List.of();
+
+        return new PageImpl<>(pageContent, pageable, dtos.size());
+    }
+
+    /**
+     * Méthode pour récupérer l'année active
+     * 
+     * @return AnneeScolaire
+     */
+    private AnneeScolaire getActiveYear() {
+        AnneeScolaire activeYear = anneeScolaireRepository.findByActive(Boolean.TRUE);
+        if (activeYear == null) {
+            throw new EntityNotFoundException("Aucune année scolaire active n'est configurée");
+        }
+        return activeYear;
     }
 }

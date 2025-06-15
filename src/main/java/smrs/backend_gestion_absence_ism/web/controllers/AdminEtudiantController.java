@@ -20,21 +20,21 @@ import smrs.backend_gestion_absence_ism.web.dto.EtudiantListDto;
 @RequestMapping("/api/web/etudiants")
 public interface AdminEtudiantController {
 
-    @Operation(summary = "Récupérer tous les etudiants", description = "Retourne la liste de tous les etudiants enregistrés dans le système")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Liste des vigiles récupérée avec succès", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = UtilisateurMobileDto.class)))),
-            @ApiResponse(responseCode = "404", description = "Aucun etduant trouvé"),
-            @ApiResponse(responseCode = "500", description = "Erreur serveur")
-    })
-    @GetMapping("")
-    ResponseEntity<List<UtilisateurMobileDto>> getAllEtudiants();
+        @Operation(summary = "Récupérer tous les etudiants", description = "Retourne la liste de tous les etudiants enregistrés dans le système")
+        @ApiResponses(value = {
+                        @ApiResponse(responseCode = "200", description = "Liste des vigiles récupérée avec succès", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = UtilisateurMobileDto.class)))),
+                        @ApiResponse(responseCode = "404", description = "Aucun etduant trouvé"),
+                        @ApiResponse(responseCode = "500", description = "Erreur serveur")
+        })
+        @GetMapping("")
+        ResponseEntity<List<UtilisateurMobileDto>> getAllEtudiants();
 
-    @Operation(summary = "Lister les étudiants de l'année active", description = "Récupère la liste de tous les étudiants inscrits pour l'année scolaire en cours")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Liste des étudiants récupérée avec succès", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = EtudiantListDto.class)))),
-            @ApiResponse(responseCode = "404", description = "Aucun étudiant trouvé"),
-            @ApiResponse(responseCode = "500", description = "Erreur serveur")
-    })
-    @GetMapping("/annee-active")
-    ResponseEntity<List<EtudiantListDto>> listerEtudiantsAnneeActive();
+        @Operation(summary = "Lister les étudiants de l'année active", description = "Récupère la liste de tous les étudiants inscrits pour l'année scolaire en cours")
+        @ApiResponses(value = {
+                        @ApiResponse(responseCode = "200", description = "Liste des étudiants récupérée avec succès", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = EtudiantListDto.class)))),
+                        @ApiResponse(responseCode = "404", description = "Aucun étudiant trouvé"),
+                        @ApiResponse(responseCode = "500", description = "Erreur serveur")
+        })
+        @GetMapping("/annee-active")
+        ResponseEntity<List<EtudiantListDto>> listerEtudiantsAnneeActive();
 }

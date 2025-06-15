@@ -12,9 +12,6 @@ import smrs.backend_gestion_absence_ism.mobile.mapper.AuthentificationMapper;
 import smrs.backend_gestion_absence_ism.services.VigileService;
 import smrs.backend_gestion_absence_ism.utils.exceptions.EntityNotFoundException;
 
-/**
- * Implémentation des services de gestion des vigiles
- */
 @Service
 @RequiredArgsConstructor
 public class VigileServiceImpl implements VigileService {
@@ -26,7 +23,7 @@ public class VigileServiceImpl implements VigileService {
      * Récupère les informations d'un vigile par son ID utilisateur
      * 
      * @param vigileId ID de l'utilisateur associé au vigile
-     * @return Données du vigile formatées pour l'application mobile
+     * @return Données du vigile
      * @throws EntityNotFoundException Si le vigile n'est pas trouvé
      */
     @Override
@@ -39,7 +36,7 @@ public class VigileServiceImpl implements VigileService {
     /**
      * Récupère la liste de tous les vigiles
      * 
-     * @return Liste des vigiles formatée pour l'application mobile
+     * @return Liste des vigiles
      */
     @Override
     public List<UtilisateurMobileDto> getAllVigiles() {

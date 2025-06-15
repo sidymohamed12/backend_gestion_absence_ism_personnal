@@ -10,12 +10,18 @@ import java.util.List;
 
 public interface AbsenceRepository extends MongoRepository<Absence, String> {
     List<Absence> findByEtudiantId(String etudiantId);
+
     List<Absence> findByCreatedAt(LocalDateTime createdAt);
+
     List<Absence> findByCoursId(String coursId);
+
     List<Absence> findByEtudiantIdAndType(String etudiantId, TypeAbsence type);
+
     List<Absence> findByEtudiantIdAndCreatedAtBetween(String etudiantId, LocalDateTime startDate,
             LocalDateTime endDate);
+
     boolean existsByEtudiantIdAndCoursId(String etudiantId, String coursId);
+
     List<Absence> findByVigileIdOrderByHeurePointageDesc(String vigileId);
 
 }

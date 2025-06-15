@@ -14,6 +14,6 @@ public interface EtudiantWebMapper {
     @Mapping(source = "id", target = "id")
     @Mapping(source = "utilisateur.nom", target = "nom")
     @Mapping(source = "utilisateur.prenom", target = "prenom")
-    @Mapping(source = "matricule", target = "matricule")
+    @Mapping(source = "utilisateur.email", target = "email")
     EtudiantListDto toDto(Etudiant etudiant);
 }

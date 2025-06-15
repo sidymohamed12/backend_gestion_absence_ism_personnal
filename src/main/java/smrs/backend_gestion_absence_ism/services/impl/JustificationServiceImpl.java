@@ -19,6 +19,8 @@ import smrs.backend_gestion_absence_ism.web.mapper.JustificationWebMapper;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -31,17 +33,34 @@ public class JustificationServiceImpl implements JustificationService {
     private final JustificationWebMapper justificationWebMapper;
     private final AdminRepository adminRepository;
 
+    /**
+     * Récupère toutes les justifications
+     *
+     * @return Liste de toutes les justifications
+     */
     @Override
     public List<Justification> getAllJustifications() {
         return justificationRepository.findAll();
     }
 
+    /**
+     * Récupère toutes les justifications en attente
+     *
+     * @return Liste de toutes les justifications
+     */
     @Override
     public List<Justification> getJustificationsEnAttente() {
         return justificationRepository.findByStatut(StatutJustification.EN_ATTENTE);
     }
 
+    /**
+     * Créer Justification pour une absence
+     * 
+     * @param request JustificationRequestDTO
+     * @return JustificationMobileDTO
+     */
     @Override
+    @Transactional
     public JustificationMobileDto ajouterJustification(JustificationRequestDto request) {
 
         Absence absence = absenceRepository.findById(request.getAbsenceId())
@@ -51,19 +70,23 @@ public class JustificationServiceImpl implements JustificationService {
             throw new IllegalStateException("Cette absence est déjà justifiée");
         }
 
-        Justification justification = new Justification();
-        justification.setDescription(request.getDescription());
-        justification.setPiecesJointes(request.getPieceJointes());
+        Justification justification = justificationMobileMapper.toEntity(request);
         justification.setAbsence(absence);
-        justification.setStatut(StatutJustification.EN_ATTENTE);
-
         Justification saved = justificationRepository.save(justification);
 
+        absence.setJustification(saved);
         absenceRepository.save(absence);
 
         return justificationMobileMapper.toDto(saved);
     }
 
+    /**
+     * Récupère une justification par son ID
+     *
+     * @param justificationId L'ID de la justification à récupérer
+     * @return JustificationMobileDto contenant les informations de la justification
+     * @throws EntityNotFoundException si la justification n'est pas trouvée
+     */
     @Override
     public JustificationMobileDto getJustificationById(String justificationId) {
         var justification = justificationRepository.findById(justificationId)
@@ -71,6 +94,12 @@ public class JustificationServiceImpl implements JustificationService {
         return justificationMobileMapper.toDto(justification);
     }
 
+    /**
+     * Traite une justification en la validant ou en la refusant
+     * 
+     * @param request
+     * @return JustificationWebDto
+     */
     @Override
     public JustificationWebDto traiterJustification(JustificationTraitementRequest request) {
         Justification justification = justificationRepository.findById(request.getJustificationId())

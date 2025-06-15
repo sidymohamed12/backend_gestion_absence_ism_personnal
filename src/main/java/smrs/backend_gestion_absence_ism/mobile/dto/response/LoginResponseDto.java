@@ -25,6 +25,8 @@ public class LoginResponseDto {
     @Schema(description = "Informations utilisateur")
     private UtilisateurMobileDto utilisateur;
 
+    private String userId;
     private String realId;
+    private Role role;
     private String redirectEndpoint;
 }

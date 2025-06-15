@@ -4,6 +4,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import smrs.backend_gestion_absence_ism.data.entities.Cours;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 public interface CoursRepository extends MongoRepository<Cours, String> {
@@ -15,4 +16,6 @@ public interface CoursRepository extends MongoRepository<Cours, String> {
     List<Cours> findByCurrentYearId(String anneeScolaireId);
 
     List<Cours> findByDateAndCurrentYearIdAndPointageFermeFalse(LocalDate date, String anneeScolaireId);
+
+    List<Cours> findByCurrentYearIdAndHeureFinBetween(String currentYearId, LocalTime heureFinAfter, LocalTime heureFinBefore);
 }

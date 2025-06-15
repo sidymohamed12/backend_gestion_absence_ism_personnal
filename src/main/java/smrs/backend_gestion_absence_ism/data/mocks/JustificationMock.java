@@ -14,8 +14,8 @@ import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
 
-// @Component
-// @Order(5)
+@Component
+@Order(5)
 @RequiredArgsConstructor
 public class JustificationMock implements CommandLineRunner {
     private final JustificationRepository justificationRepository;

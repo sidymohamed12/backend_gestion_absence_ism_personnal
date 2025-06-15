@@ -12,6 +12,7 @@ import smrs.backend_gestion_absence_ism.data.repositories.EtudiantRepository;
 import smrs.backend_gestion_absence_ism.data.repositories.AnneeScolaireRepository;
 import smrs.backend_gestion_absence_ism.data.repositories.InscriptionRepository;
 import smrs.backend_gestion_absence_ism.services.ClasseService;
+import smrs.backend_gestion_absence_ism.utils.exceptions.EntityNotFoundException;
 import smrs.backend_gestion_absence_ism.web.dto.ClasseWebDto;
 import smrs.backend_gestion_absence_ism.web.mapper.ClasseWebMapper;
 import smrs.backend_gestion_absence_ism.data.entities.Classe;
@@ -27,6 +28,13 @@ public class ClasseServiceImpl implements ClasseService {
     private final InscriptionRepository inscriptionRepository;
     private final EtudiantRepository etudiantRepository;
 
+    /**
+     * Récupére toutes les classes en fonction des paramétres de filtrage
+     * 
+     * @param searchFiliere La filière à filtrer (peut être null ou vide)
+     * @param searchNiveau  Le niveau à filtrer (peut être null ou vide)
+     * @return Une liste de classes correspondant aux critères de filtrage
+     */
     @Override
     public List<Classe> getAllClasses(String searchFiliere, String searchNiveau) {
         try {
@@ -63,6 +71,11 @@ public class ClasseServiceImpl implements ClasseService {
         }
     }
 
+    /**
+     * Récupère toutes les classes sans filtrage
+     * 
+     * @return Une liste de toutes les classes
+     */
     @Override
     public List<ClasseWebDto> getAllClasses() {
         try {
@@ -71,60 +84,111 @@ public class ClasseServiceImpl implements ClasseService {
             response.forEach(c -> c.setEffectif(etudiantRepository.countEtudiantByClasseId(c.getId())));
             return response;
         } catch (Exception e) {
-            throw new RuntimeException("Erreur lors de la récupération de toutes les classes : ", e);
+            throw new EntityNotFoundException(
+                    "Erreur lors de la récupération de toutes les classes : " + e.getMessage());
         }
     }
 
+    /**
+     * Récupére les classes par niveau
+     * 
+     * @param filiere La filiere de la classe à récupérer
+     * @return Une liste de classes correspondant à la filiere spécifié
+     */
     @Override
     public List<Classe> getClassesByFiliere(Filiere filiere) {
         try {
             return classeRepository.findByFiliere(filiere);
         } catch (Exception e) {
-            throw new RuntimeException("Erreur lors de la récupération des classes par filière : ", e);
+            throw new EntityNotFoundException("Erreur lors de la récupération des classes par filière : " + e);
         }
     }
 
+    /**
+     * Récupére les classes par niveau
+     * 
+     * @param niveau Le niveau de la classe à récupérer
+     * @return Une liste de classes correspondant au niveau spécifié
+     */
     @Override
     public List<Classe> getClassesByNiveau(String niveau) {
         try {
             return classeRepository.findByNiveau(niveau);
         } catch (Exception e) {
-            throw new RuntimeException("Erreur lors de la récupération des classes par niveau : ", e);
+            throw new EntityNotFoundException("Erreur lors de la récupération des classes par niveau : " + e);
         }
     }
 
+    /**
+     * Récupère les classes par filière et niveau
+     * 
+     * @param filiere La filière de la classe à récupérer
+     * @param niveau  Le niveau de la classe à récupérer
+     * @return Une liste de classes correspondant à la filière et au niveau
+     *         spécifié
+     */
     @Override
     public List<Classe> getClassesByFiliereAndNiveau(Filiere filiere, String niveau) {
         try {
             return classeRepository.findByFiliereAndNiveau(filiere, niveau);
         } catch (Exception e) {
-            throw new RuntimeException("Erreur lors de la récupération des classes par filière et niveau : ", e);
+            throw new EntityNotFoundException(
+                    "Erreur lors de la récupération des classes par filière et niveau : " + e);
         }
     }
 
+    /**
+     * Récupère les classes pour l'année scolaire active
+     * 
+     * @return Une liste de classes pour l'année scolaire active
+     */
     @Override
     public List<Classe> getClassesForActiveAcademicYear() {
         try {
-            // Récupérer l'année scolaire active
             AnneeScolaire activeYear = anneeScolaireRepository.findByActive(true);
             if (activeYear == null) {
-                throw new RuntimeException("Aucune année scolaire active n'est configurée");
+                throw new EntityNotFoundException("Aucune année scolaire active n'est configurée");
             }
 
-            // Récupérer les inscriptions valides pour l'année active
             List<Inscription> inscriptions = inscriptionRepository.findByAnneeScolaireAndValide(activeYear, true);
-
-            // Extraire les classes des étudiants inscrits pour l'année active
-            Set<Classe> classes = new HashSet<>();
-            for (Inscription inscription : inscriptions) {
-                if (inscription.getEtudiant() != null && inscription.getEtudiant().getClasse() != null) {
-                    classes.add(inscription.getEtudiant().getClasse());
-                }
+            if (inscriptions.isEmpty()) {
+                throw new EntityNotFoundException("Aucune inscription valide trouvée pour l'année scolaire active");
             }
 
-            return new ArrayList<>(classes);
+            return getClassesFromInscriptionActiveYear(inscriptions);
+
         } catch (Exception e) {
-            throw new RuntimeException("Erreur lors de la récupération des classes pour l'année scolaire active : ", e);
+            throw new EntityNotFoundException(
+                    "Erreur lors de la récupération des classes pour l'année scolaire active : " + e);
         }
+    }
+
+    /**
+     * Récupère les classes à partir des inscriptions pour l'année scolaire active
+     * 
+     * @param inscriptions La liste des inscriptions pour l'année scolaire active
+     * @return Une liste de classes uniques associées aux inscriptions
+     */
+    private List<Classe> getClassesFromInscriptionActiveYear(List<Inscription> inscriptions) {
+        Set<Classe> classes = new HashSet<>();
+        for (Inscription inscription : inscriptions) {
+            if (inscription.getEtudiant() != null && inscription.getEtudiant().getClasse() != null) {
+                classes.add(inscription.getEtudiant().getClasse());
+            }
+        }
+        return new ArrayList<>(classes);
+    }
+
+    /**
+     * Récupère une classe par son ID
+     * 
+     * @param classeId L'ID de la classe à récupérer
+     * @return La classe correspondante
+     */
+    @Override
+    public ClasseWebDto getClasseById(String classeId) {
+        var classe = classeRepository.findById(classeId)
+                .orElseThrow(() -> new RuntimeException("Classe non trouvée avec l'ID : " + classeId));
+        return ClasseWebMapper.INSTANCE.toDto(classe);
     }
 }

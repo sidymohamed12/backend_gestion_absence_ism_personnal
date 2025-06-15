@@ -45,10 +45,7 @@ public class PointageServiceImpl implements PointageService {
     // --------------------------------- FONCTION PRIVATE POUR ADD POINTAGE
     // -----------------------------------------
 
-    /**
-     * on va recercher le cours en cours ou le prochain cours
-     */
-    private Cours trouverCoursActuel(List<Cours> cours, LocalTime heureActuelle) {
+    private Cours trouverCoursActuelOuAVenir(List<Cours> cours, LocalTime heureActuelle) {
         // Cours en cours (dans les 15 minutes après le début)
         for (Cours c : cours) {
             LocalTime debut = c.getHeureDebut();
@@ -93,8 +90,6 @@ public class PointageServiceImpl implements PointageService {
         }
     }
 
-    // ----------------------------------------------------------------------------------------------
-
     /**
      * pour enregistrer pointage
      * 
@@ -110,10 +105,8 @@ public class PointageServiceImpl implements PointageService {
         Vigile vigile = vigileRepository.findById(request.getVigileId())
                 .orElseThrow(() -> new EntityNotFoundException("Vigile non trouvé"));
 
-        // on calcule la date à la quelle on est et on récupére aussi le jour
         LocalDateTime maintenant = LocalDateTime.now();
 
-        // on récupère l'année encours
         AnneeScolaire anneeScolaire = anneeScolaireRepository.findByActive(Boolean.TRUE);
         if (anneeScolaire == null) {
             log.warn("Aucune année scolaire active");
@@ -127,18 +120,14 @@ public class PointageServiceImpl implements PointageService {
         if (coursAujourdhui.isEmpty()) {
             log.info("Aucun cours aujourd'hui pour l'étudiant {}, pointage historique seulement",
                     etudiant.getMatricule());
-            Absence absence = new Absence();
-            absence.setHeurePointage(maintenant);
-            absence.setType(TypeAbsence.PRESENT);
-            absence.setEtudiant(etudiant);
-            absence.setVigile(vigile);
-            absence.onPrePersist();
-            absenceRepository.save(absence);
+            Absence absence = creerAbsence(etudiant, null, vigile, maintenant,
+                    TypeAbsence.PRESENT, null, null, null);
+
             return CompletableFuture.completedFuture(pointageMobileMapper.toHistoriquePointageMobileDto(absence));
         }
 
         // Trouver le cours en cours ou à venir
-        Cours coursActuel = trouverCoursActuel(coursAujourdhui, maintenant.toLocalTime());
+        Cours coursActuel = trouverCoursActuelOuAVenir(coursAujourdhui, maintenant.toLocalTime());
 
         // on regarde si l'etudiant a deja ete pointe
         if (absenceRepository.existsByEtudiantIdAndCoursId(etudiant.getId(), coursActuel.getId())) {
@@ -150,27 +139,51 @@ public class PointageServiceImpl implements PointageService {
         LocalTime heureDebut = coursActuel.getHeureDebut();
         LocalTime heureArrivee = maintenant.toLocalTime();
 
-        Integer minutesRetard = calculerMinutesRetard(heureDebut, heureArrivee);
+        Integer minutesRetard = calculerMinutesRetard(heureDebut, heureArrivee) - TOLERANCE_RETARD_MINUTES;
         TypeAbsence typeAbsence = determinerTypeAbsence(minutesRetard);
 
-        // Créer l'absence/présence
-        Absence absence = new Absence();
-        absence.setHeurePointage(maintenant);
-        absence.setMinutesRetard(Math.max(0, minutesRetard));
-        absence.setType(typeAbsence);
-        absence.setEtudiant(etudiant);
-        absence.setCours(coursActuel);
-        absence.setVigile(vigile);
-        absence.setDuree(Duration.between(heureDebut, heureArrivee).toMinutes() > 0 ? heureArrivee : heureDebut);
-        absence.onPrePersist();
-        absenceRepository.save(absence);
+        Absence absence = creerAbsence(etudiant, coursActuel, vigile, maintenant, typeAbsence, minutesRetard,
+                heureDebut, heureArrivee);
 
         return CompletableFuture.completedFuture(pointageMobileMapper.toHistoriquePointageMobileDto(absence));
 
     }
 
     /**
+     * Méthode pour créer une absence
+     * 
+     * @param etudiant
+     * @param cours
+     * @param vigile
+     * @param date
+     * @param typeAbsence
+     * @param minutesRetard
+     * @param heureDebut
+     * @param heureArrivee
+     * @return une Absence enregistrer
+     */
+    private Absence creerAbsence(Etudiant etudiant, Cours cours, Vigile vigile, LocalDateTime date,
+            TypeAbsence typeAbsence, Integer minutesRetard, LocalTime heureDebut, LocalTime heureArrivee) {
+        Absence absence = new Absence();
+        absence.setHeurePointage(date);
+        absence.setMinutesRetard(Math.max(0, minutesRetard));
+        absence.setType(typeAbsence);
+        absence.setEtudiant(etudiant);
+        absence.setCours(cours);
+        absence.setVigile(vigile);
+        absence.setDuree(Duration.between(heureDebut, heureArrivee).toMinutes() > 0 ? heureArrivee : heureDebut);
+        absence.onPrePersist();
+        return absenceRepository.save(absence);
+    }
+
+    /**
      * Récupère l'historique de pointage pour un vigile
+     * 
+     * @param vigileId          l'id du vigile
+     * @param date              la date pour filtrer les pointages (nullable)
+     * @param etudiantMatricule la matricule de l'etudiant pour filtrer les
+     *                          pointages (nullable)
+     * @return une liste de pointages filtrés
      */
     public List<HistoriquePointageMobileDto> getHistoriquePointage(String vigileId,
             // LocalDate dateDebut,
