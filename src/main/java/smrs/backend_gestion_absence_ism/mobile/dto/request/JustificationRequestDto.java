@@ -2,8 +2,6 @@ package smrs.backend_gestion_absence_ism.mobile.dto.request;
 
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -33,4 +33,12 @@ public class AdminEtudiantControllerImpl implements AdminEtudiantController {
         var response = etudiantService.listerEtudiantsAnneeActive();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @Override
+    public ResponseEntity<UtilisateurMobileDto> getDetailEtudiant(String id) {
+        if (id == null || id.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.ok(etudiantService.getEtudiantById(id));
+    }
 }

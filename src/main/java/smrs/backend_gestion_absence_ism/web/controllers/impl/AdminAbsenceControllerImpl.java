@@ -14,6 +14,7 @@ import smrs.backend_gestion_absence_ism.mobile.dto.RestResponse;
 import smrs.backend_gestion_absence_ism.services.AbsenceService;
 import smrs.backend_gestion_absence_ism.web.controllers.AdminAbsenceController;
 import smrs.backend_gestion_absence_ism.web.dto.AbsenceDetailWithJustificationDto;
+import smrs.backend_gestion_absence_ism.web.dto.StatAbsence;
 
 @RestController
 @AllArgsConstructor
@@ -21,6 +22,9 @@ public class AdminAbsenceControllerImpl implements AdminAbsenceController {
     private final AbsenceService absenceService;
 
     public ResponseEntity<AbsenceDetailWithJustificationDto> getAbsenceDetail(String id) {
+        if (id == null || id.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
         return ResponseEntity.ok(absenceService.getAbsenceDetailWithJustification(id));
     }
 
@@ -36,6 +40,11 @@ public class AdminAbsenceControllerImpl implements AdminAbsenceController {
                 new int[totalPages], absences.getNumber(), totalPages,
                 absences.getTotalElements(), absences.isFirst(), absences.isLast()),
                 HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<StatAbsence> getStatAbsence() {
+        return ResponseEntity.ok(absenceService.getStatistiqueAbsence());
     }
 
 }

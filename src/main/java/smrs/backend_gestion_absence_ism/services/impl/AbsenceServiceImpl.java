@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import smrs.backend_gestion_absence_ism.data.entities.Absence;
 import smrs.backend_gestion_absence_ism.data.entities.AnneeScolaire;
 import smrs.backend_gestion_absence_ism.data.entities.Etudiant;
+import smrs.backend_gestion_absence_ism.data.enums.StatutJustification;
 import smrs.backend_gestion_absence_ism.data.enums.TypeAbsence;
 import smrs.backend_gestion_absence_ism.data.repositories.AbsenceRepository;
 import smrs.backend_gestion_absence_ism.data.repositories.AnneeScolaireRepository;
@@ -21,6 +22,7 @@ import smrs.backend_gestion_absence_ism.utils.exceptions.EntityNotFoundException
 import smrs.backend_gestion_absence_ism.web.dto.AbsenceDetailWithJustificationDto;
 import smrs.backend_gestion_absence_ism.web.dto.AbsenceWebDto;
 import smrs.backend_gestion_absence_ism.web.dto.JustificationForAbsenceDetail;
+import smrs.backend_gestion_absence_ism.web.dto.StatAbsence;
 import smrs.backend_gestion_absence_ism.web.mapper.AbsenceWebMapper;
 import smrs.backend_gestion_absence_ism.web.mapper.JustificationWebMapper;
 
@@ -264,5 +266,31 @@ public class AbsenceServiceImpl implements AbsenceService {
             throw new EntityNotFoundException("Aucune année scolaire active n'est configurée");
         }
         return activeYear;
+    }
+
+    @Override
+    public StatAbsence getStatistiqueAbsence() {
+        AnneeScolaire activeYear = getActiveYear();
+        var absences = absenceRepository.findAll().stream()
+                .filter(absence -> absence.getCours() != null
+                        && absence.getCours().getCurrentYear() != null
+                        && absence.getCours().getCurrentYear().getId().equals(activeYear.getId())
+                        && absence.getType() != TypeAbsence.PRESENT)
+                .toList();
+
+        StatAbsence stat = new StatAbsence();
+        stat.setTotalAbsenceRetard(absences.size());
+        stat.setTotalAbsence((int) absences.stream().filter(a -> a.getType() == TypeAbsence.ABSENCE_COMPLETE).count());
+        stat.setTotalRetard((int) absences.stream().filter(a -> a.getType() == TypeAbsence.RETARD).count());
+        stat.setTotalJustifie((int) absences.stream().filter(a -> a.getJustification() != null).count());
+        stat.setTotalNonJustifie((int) absences.stream().filter(a -> a.getJustification() == null).count());
+        stat.setTotalTraite(
+                (int) absences.stream()
+                        .filter(a -> a.getJustification() != null
+                                && (a.getJustification().getStatut() == StatutJustification.REJETEE
+                                        || a.getJustification().getStatut() == StatutJustification.VALIDEE))
+                        .count());
+
+        return stat;
     }
 }

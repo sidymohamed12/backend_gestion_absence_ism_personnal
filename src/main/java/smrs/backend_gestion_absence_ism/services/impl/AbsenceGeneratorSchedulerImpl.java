@@ -38,7 +38,7 @@ public class AbsenceGeneratorSchedulerImpl implements AbsenceGeneratorScheduler 
      */
 
     @Override
-    @Scheduled(cron = "0 * * * * *") // Toutes les minutes
+    @Scheduled(cron = "0 * * * * *")
     @Transactional
     public void genererAbsencesPourCoursTermines() {
         LocalDate aujourdhui = LocalDate.now();
@@ -51,7 +51,7 @@ public class AbsenceGeneratorSchedulerImpl implements AbsenceGeneratorScheduler 
 
         List<Cours> coursTermines = coursRepository.findByCurrentYearIdAndHeureFinBetween(
                 anneeActive.getId(),
-                maintenant.minus(1, ChronoUnit.MINUTES), // 1 minute avant maintenant
+                maintenant.minus(1, ChronoUnit.MINUTES),
                 maintenant);
 
         log.info("{} cours terminés à {} le {}", coursTermines.size(), maintenant, aujourdhui);

@@ -34,12 +34,12 @@ public class AjoutCours implements CommandLineRunner {
         List<AnneeScolaire> annees = anneeScolaireRepository.findAll();
 
         Cours cours = new Cours();
-        cours.setId(String.valueOf("12"));
-        cours.setNom("Cours Test5");
-        cours.setEnseignant("Sidy SAIZONOU");
-        cours.setSalle("202");
-        cours.setHeureDebut(LocalTime.of(00, 30));
-        cours.setHeureFin(LocalTime.of(01, 58));
+        cours.setId(String.valueOf("15"));
+        cours.setNom("Cours Hackathon");
+        cours.setEnseignant("Monkey D SAï");
+        cours.setSalle("304");
+        cours.setHeureDebut(LocalTime.of(17, 00));
+        cours.setHeureFin(LocalTime.of(21, 00));
         cours.setDate(LocalDate.now());
         cours.setJour(cours.getDate().getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.FRENCH));
         cours.setMatiere(matieres.get(1));

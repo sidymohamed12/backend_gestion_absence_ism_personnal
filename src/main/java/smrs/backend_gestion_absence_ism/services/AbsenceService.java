@@ -6,6 +6,7 @@ import smrs.backend_gestion_absence_ism.mobile.dto.response.AbsenceMobileDto;
 import smrs.backend_gestion_absence_ism.mobile.dto.response.EtudiantAccueilMobileDto;
 import smrs.backend_gestion_absence_ism.web.dto.AbsenceDetailWithJustificationDto;
 import smrs.backend_gestion_absence_ism.web.dto.AbsenceWebDto;
+import smrs.backend_gestion_absence_ism.web.dto.StatAbsence;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -35,4 +36,7 @@ public interface AbsenceService {
     AbsenceDetailWithJustificationDto getAbsenceDetailWithJustification(String absenceId);
 
     Page<AbsenceWebDto> getAllAbsences(Pageable pageable, TypeAbsence typeAbsence, LocalDate date);
+
+    StatAbsence getStatistiqueAbsence();
+
 }

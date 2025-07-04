@@ -16,7 +16,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Arrays;
 
 @Slf4j
 @Component
@@ -66,27 +65,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }
             }
         }
-
-        // ...existing code...
-        // String token = null;
-
-        // // Lire le token depuis le cookie
-        // if (request.getCookies() != null) {
-        // for (Cookie cookie : request.getCookies()) {
-        // if ("token".equals(cookie.getName())) {
-        // token = cookie.getValue();
-        // break;
-        // }
-        // }
-        // }
-
-        // // Si pas trouvé dans le cookie, tu peux aussi vérifier le header si besoin
-        // if (token == null) {
-        // String authHeader = request.getHeader("Authorization");
-        // if (authHeader != null && authHeader.startsWith("Bearer ")) {
-        // return authHeader.substring(7);
-        // }
-        // }
 
         return null;
     }
