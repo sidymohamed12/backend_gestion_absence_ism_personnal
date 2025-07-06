@@ -20,7 +20,7 @@ Content-Type: application/json
   }
 
 ################
-POST http://localhost:8080/api/mobile/auth/login
+POST http://localhost:8080/api/auth/login
 Content-Type: application/json 
 
   {
@@ -29,7 +29,7 @@ Content-Type: application/json
   }
 
 ################
-POST http://localhost:8080/api/web/auth/login
+POST http://localhost:8080/api/auth/login
 Content-Type: application/json 
 
   {
@@ -45,6 +45,7 @@ GET http://localhost:8080/api/web/absences/5
 
 ###############
 POST http://localhost:8080/api/mobile/etudiant/justification
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJtYW1lQGlzbS5lZHUuc24iLCJpYXQiOjE3NTE4Mjg1MzcsImV4cCI6MTc1MTgzMjEzN30.RV6dbMwoTSoqNsN8t2YPyXKRv82IjOD3_-E72254VxAskcftYYySS9gL--UftirKTpvGSaDAfWrUpEa_EDsFug
 Content-Type: application/json 
 
 {
